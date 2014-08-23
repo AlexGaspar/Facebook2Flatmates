@@ -4,6 +4,7 @@
   "description": "Scrappe a given facebook group parse the results and store it to an elasticsearch database",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Alex Gaspar",

@@ -31,7 +31,7 @@ var Facebook2Flatmate = function(groupId, accessKey, timeToWait) {
   this.es = null;
   this.deepCount = this.defaultDeepCount = config.app.deep || 10;
 
-  this.timeToWait = timeToWait || config.defaultTime2wait;
+  this.timeToWait = timeToWait || config.app.defaultTime2wait;
   this.facebookToken = accessKey;
   this.groupId = groupId;
 

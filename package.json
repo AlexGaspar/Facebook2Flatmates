@@ -1,0 +1,19 @@
+{
+  "name": "Fb2Es",
+  "version": "0.0.1",
+  "description": "Scrappe a given facebook group parse the results and store it to an elasticsearch database",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alex Gaspar",
+  "license": "ISC",
+  "dependencies": {
+    "fbgraph": "~0.2.8",
+    "q": "~1.0.0",
+    "fql": "~0.1.2",
+    "fb": "~0.6.2",
+    "elasticsearch": "~2.1.4",
+    "moment": "~2.6.0"
+  }
+}

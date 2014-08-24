@@ -10,9 +10,6 @@ var Q    = require('q')
 // Constantes
 var MIN_PRICE = 200;
 
-// Init FQL
-FB.setAccessToken(config.facebook.userToken);
-
 
 /**
  * Find and returns price if > 200€
@@ -98,8 +95,12 @@ var getImage = function (post) {
  * @param  {[type]} message [description]
  * @return {[type]}         [description]
  */
-module.exports.getInfos = function (post, callback) {
+module.exports.getInfos = function (post, token, callback) {
   if(!post || !post.message) return null;
+
+  // Init FQL
+  FB.setAccessToken(token);
+
   var message = post.message
     , post_id = post.id
     , date    = post.created_time

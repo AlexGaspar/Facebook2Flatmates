@@ -1,12 +1,12 @@
 var graph   = require('fbgraph')
   , config  = require('./config/default.js')
-  , Promise = require("bluebird");
-  , facebook     = require('./helpers/facebook.js')
+  , Promise = require("bluebird")
+  , feedParser    = require('./helpers/facebook.js')
   , elasticsearch = require('elasticsearch')
   ;
 
 var Facebook2Flatmate = function(groupId, accessKey, timeToWait) {
-  if(typeof groupIds === 'undefined') {
+  if(typeof groupId !== 'number') {
     throw new Error('You must provide a valid facebook group id');
   }
 

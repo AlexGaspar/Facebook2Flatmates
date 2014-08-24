@@ -10,6 +10,10 @@
   },
   "author": "Alex Gaspar",
   "license": "ISC",
+  "devDependencies": {
+    "chai": "*",
+    "mocha": "~1.21.4"
+  },
   "dependencies": {
     "fbgraph": "~0.2.8",
     "q": "~1.0.0",
@@ -17,6 +21,6 @@
     "fb": "~0.6.2",
     "elasticsearch": "~2.1.4",
     "moment": "~2.6.0",
-    "mocha": "~1.21.4"
+    "bluebird": "~2.3.1"
   }
 }

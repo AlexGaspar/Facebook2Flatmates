@@ -1,7 +1,6 @@
 var graph   = require('fbgraph')
   , config  = require('./config/default.js')
   , Promise = require("bluebird");
-  , format      = require('util').format
   , facebook     = require('./helpers/facebook.js')
   , elasticsearch = require('elasticsearch')
   ;

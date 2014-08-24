@@ -7,18 +7,6 @@ var graph   = require('fbgraph')
   , elasticsearch = require('elasticsearch')
   ;
 
-
-/**
- * Constantes
- */
-var WAIT_BEFORE_NEW_REQUEST = (config.appEnv === 'development')
-                              ? 1000 * 5 // Check safest time
-                              : 1000 * 60 * 10 ; // Check safest time
-
-var WAIT_NEW_FEED = 1000 * 60 * 90;
-
-
-
 var Facebook2Flatmate = function(groupId, accessKey, timeToWait) {
   if(typeof groupIds === 'undefined') {
     throw new Error('You must provide a valid facebook group id');

@@ -9,7 +9,7 @@
     "mocha": "NODE_ENV=test ./node_modules/.bin/mocha --reporter spec test/"
   },
   "author": "Alex Gaspar",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "chai": "*",
     "mocha": "~1.21.4"

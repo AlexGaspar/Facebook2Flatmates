@@ -6,20 +6,23 @@ var graph   = require('fbgraph')
   ;
 
 var Facebook2Flatmate = function(groupId, accessKey, timeToWait) {
-  if(typeof groupId !== 'number') {
-    throw new Error('You must provide a valid facebook group id');
+  if(typeof groupId === 'undefined' || groupId === null) {
+    throw new Error('You must provide a facebook group id');
   }
 
-  if(typeof accessKey !== 'object') {
-    throw new Error('You must provide a valid api key \n { token: "AAAEEEERRR..." }');
-  }
+  // if(typeof accessKey !== 'object') {
+  //   throw new Error('You must provide a valid api key \n { token: "AAAEEEERRR..." }');
+  // }
 
   this.es = null;
   this.deepCount = this.defaultDeepCount = config.app.deep || 10;
 
   this.timeToWait = timeToWait || config.app.defaultTime2wait;
   this.facebookToken = accessKey;
-  this.groupId = groupId;
+  this.groupId = parseInt(groupId);
+
+  // Authenticate FB request
+  graph.setAccessToken( this.facebookToken );
 
   // Start
   this.loop();
@@ -30,19 +33,23 @@ var Facebook2Flatmate = function(groupId, accessKey, timeToWait) {
  * @param  {[type]} id [description]
  * @return {[type]}    [description]
  */
-Facebook2Flatmate.prototype.getFacebookFeed = function(req) {
-  if(typeof req === 'undefined') { throw new Error('Params cannot be null'); }
-
+Facebook2Flatmate.prototype.getFacebookFeed = function(param) {
   var deferred = Promise.pending();
+  var req = param || this.groupId;
+  var fbParams = config.facebook.params;
   var query;
 
-  if(typeof req === 'string') {
+  if(typeof req === 'number') {
     query = req + "/feed";
-  } else if (res.paging && res.paging.next) {
+  } else if (req.paging && req.paging.next) {
     query = req.paging.next;
+    delete fbParams['since'];
+    delete fbParams['until'];
+  } else {
+    deferred.reject('No more stuff to fetch...')
   }
 
-  graph.get(query, this.facebookToken, function(err, res) {
+  graph.get(query, fbParams, function(err, res) {
     if(err || typeof res === 'undefined') {
       deferred.reject(err || 'No Results');
     } else {
@@ -55,9 +62,10 @@ Facebook2Flatmate.prototype.getFacebookFeed = function(req) {
 
 
 Facebook2Flatmate.prototype.getElasticSearch = function() {
-  if(typeof this.es === null) {
+  if(this.es === null) {
     this.es = new elasticsearch.Client({
       host: config.es.host
+      // , log: 'trace'
     });
   }
 
@@ -66,12 +74,10 @@ Facebook2Flatmate.prototype.getElasticSearch = function() {
 
 
 Facebook2Flatmate.prototype.storeDataToES = function(data) {
-  if(typeof data !== 'array') {
-    throw new Error('No more data to store');
-  }
+  var self = this;
 
   data.forEach(function(post) {
-    feedParser.getFormatedInfos(post, function(formatedData) {
+    feedParser.getFormatedInfos(post, self.facebookToken, function(formatedData) {
       // We will only store post with a price or images
       // this should avoid false results
       if(formatedData.images || formatedData.price) {
@@ -80,13 +86,14 @@ Facebook2Flatmate.prototype.storeDataToES = function(data) {
 
         delete formatedData.fbId; delete formatedData.date;
 
-        this.es.create({
+        self.getElasticSearch().create({
             index: config.es.index
           , type: config.es.type
           , id: esId
           , timestamp: esDate
           , body: formatedData
         }, function (error, response) {
+          console.log(error || response);
           if(error && error.message.search('document already exists') === -1) {
             throw new Error(error);
           }
@@ -101,32 +108,34 @@ Facebook2Flatmate.prototype.storeDataToES = function(data) {
  * @return {[type]} [description]
  */
 Facebook2Flatmate.prototype.loop = function(param) {
+  var self = this;
 
   this.getFacebookFeed(param)
     .then(function(res) {
-      this.storeDataToES(res.data);
+      self.storeDataToES(res.data);
 
       return res;
     })
     .then(function(res) {
-      var timeToWait = this.timeToWait;
+      var timeToWait = self.timeToWait;
 
       // Once we went deeper enough we'll wait longer
       // before going back to the first post
-      if(--deepCount === 0) {
-        this.deepCount = this.defaultDeepCount;
+      if(--self.deepCount === 0) {
+        self.deepCount = self.defaultDeepCount;
 
-        res = this.groupId;
+        res = self.groupId;
         timeToWait = timeToWait * 1000 * 60 * 60 * 2;
       }
 
       setTimeout(
-        function () { this.loop(res); },
+        function () { self.loop(res); },
         timeToWait
       );
 
     })
     .catch(function(err) {
+      console.log(err);
       var errorMessage = [
           "..."
         , err

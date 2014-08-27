@@ -95,7 +95,7 @@ var getImage = function (post) {
  * @param  {[type]} message [description]
  * @return {[type]}         [description]
  */
-module.exports.getInfos = function (post, token, callback) {
+module.exports.getFormatedInfos = function (post, token, callback) {
   if(!post || !post.message) return null;
 
   // Init FQL

@@ -66,7 +66,7 @@ var getAlbumFromFacebook = function(post) {
       var imagesList = [];
       res.data[0].attachment.media.forEach(function(image) {
         // Drop images with oh= parameter
-        if(image.src.search('oh=') === -1) imagesList.push(image.src.replace('_s.','_n.'));
+        if(image.src.search('oh=') === -1) imagesList.push(image.src.replace('_s.','_n.').replace('/s130x130',''));
       });
       deferred.resolve(imagesList);
     } else {
@@ -86,7 +86,7 @@ var getImage = function (post) {
   if(type === 'photo') {
     return getAlbumFromFacebook(post);
   } else if (post.picture) {
-    return post.picture.replace('_s.','_n.');
+    return post.picture.replace('_s.','_n.').replace('/s130x130','');
   }
 }
 
